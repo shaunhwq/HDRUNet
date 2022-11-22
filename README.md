@@ -49,6 +49,23 @@ https://competitions.codalab.org/competitions/28161#participate-get-data
 pip install -r requirements.txt
 ```
 
+### Testing (on external images, for cuda-10.2)
+
+Installation
+```
+conda create -n HDRUNet python=3.8.0
+conda activate HDRUNet
+conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=10.2 -c pytorch
+pip3 install opencv-python tqdm scipy pyyaml
+```
+
+Running
+```
+export LD_LIBRARY_PATH=/data2/shaun/cuda-10.2/lib64:$LD_LIBRARY_PATH
+export CUDA_VISIBLE_DEVICES=3
+python3 codes/test_demo.py --input_dir path_to_input_folder --output_dir path_to_output_folder
+```
+
 ### How to test
 
 - Modify `dataroot_LQ` and `pretrain_model_G` (you can also use the pretrained model which is provided in the `./pretrained_model`) in `./codes/options/test/test_HDRUNet.yml`, then run
