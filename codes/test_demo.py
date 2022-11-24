@@ -39,7 +39,7 @@ def restore_pyr_crop(img: np.array, original_shape: tuple) -> np.array:
         return img
 
     # Zero pad and place cropped image in center
-    restored = np.zeros(original_shape, dtype=np.uint8)
+    restored = np.zeros(original_shape, dtype=np.float32)
     start_h, start_w = int((oh - ih) // 2), int((ow - iw) // 2)
     restored[start_h: start_h + ih, start_w: start_w + iw, ::] = img
 
@@ -71,16 +71,8 @@ def visualize_model_output(output: torch.tensor) -> np.array:
     """
     output = output.detach()[0].float().cpu()
     output = util.tensor2numpy(output)
-
-    align_ratio = (2 ** 16 - 1) / output.max()
-    uint16_image_gt = np.round(output * align_ratio).astype(np.uint16)
-
-    res_linear_image = uint16_image_gt ** 2.24
-    norm_perc = np.percentile(res_linear_image, 99)
-    res_image = (m.tanh_norm_mu_tonemap(res_linear_image, norm_perc) * 255.).round().astype(np.uint8)
-    #res_image = cv2.cvtColor(res_image, cv2.COLOR_RGB2BGR)
-
-    return res_image
+    output = output ** 2.24
+    return output
 
 
 if __name__ == "__main__":
@@ -117,5 +109,7 @@ if __name__ == "__main__":
             # Transform model output and save
             output = visualize_model_output(model_output)
             padded_img = restore_pyr_crop(output, in_image.shape)
-            output_path = os.path.join(opt.output_dir, os.path.basename(img_path))
+
+            new_name = os.path.splitext(os.path.basename(img_path))[0] + ".hdr"
+            output_path = os.path.join(opt.output_dir, new_name)
             cv2.imwrite(output_path, padded_img)
