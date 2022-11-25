@@ -35,7 +35,7 @@ def restore_pyr_crop(img: np.array, original_shape: tuple) -> np.array:
     """
     oh, ow, _ = original_shape
     ih, iw, _ = img.shape
-    if oh == ih or ow == iw:
+    if oh == ih and ow == iw:
         return img
 
     # Zero pad and place cropped image in center
